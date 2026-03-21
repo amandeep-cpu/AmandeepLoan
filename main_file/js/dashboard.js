@@ -28,25 +28,34 @@ function calculateAnalytics(loans) {
       return sum + (loan.payments ? loan.payments.reduce((pSum, payment) => pSum + payment.amount, 0) : 0);
     }, 0),
     totalOutstanding: 0,
-    statusBreakdown: { active: 0, paid: 0, overdue: 0 },
+    statusBreakdown: { active: 0, paid_off: 0, overdue: 0 },
+    loansByStatus: { active: 0, paid_off: 0, overdue: 0 },
+    monthlyPayments: {},
     recentPayments: [],
     upcomingPayments: []
   };
 
   analyticsData.totalOutstanding = analyticsData.totalAmount - analyticsData.totalPaid;
 
-  // Calculate status breakdown
+  // Calculate status breakdown and monthly payments
   loans.forEach(loan => {
     const totalPaid = loan.payments ? loan.payments.reduce((sum, p) => sum + p.amount, 0) : 0;
-    const progress = (totalPaid / loan.amount) * 100;
+    const progress = loan.amount > 0 ? (totalPaid / loan.amount) * 100 : 0;
 
     if (progress >= 100) {
-      analyticsData.statusBreakdown.paid++;
+      analyticsData.statusBreakdown.paid_off++;
+      analyticsData.loansByStatus.paid_off++;
     } else {
       analyticsData.statusBreakdown.active++;
+      analyticsData.loansByStatus.active++;
     }
 
-    // Collect recent payments
+    if (loan.status && loan.status.toLowerCase() === 'overdue') {
+      analyticsData.statusBreakdown.overdue++;
+      analyticsData.loansByStatus.overdue++;
+    }
+
+    // Collect recent payments and support monthly aggregation
     if (loan.payments) {
       loan.payments.forEach(payment => {
         analyticsData.recentPayments.push({
@@ -54,6 +63,9 @@ function calculateAnalytics(loans) {
           borrowerName: loan.borrowerName,
           loanId: loan.id
         });
+
+        const paymentMonth = new Date(payment.date).toISOString().slice(0, 7); // YYYY-MM
+        analyticsData.monthlyPayments[paymentMonth] = (analyticsData.monthlyPayments[paymentMonth] || 0) + payment.amount;
       });
     }
   });
@@ -75,6 +87,24 @@ function updateMetrics() {
   document.getElementById('amount-change').textContent = `$${analyticsData.totalAmount.toLocaleString()} total`;
   document.getElementById('paid-change').textContent = `$${analyticsData.totalPaid.toLocaleString()} collected`;
   document.getElementById('outstanding-change').textContent = `$${analyticsData.totalOutstanding.toLocaleString()} remaining`;
+
+  // Portfolio health
+  const activeCount = analyticsData.loansByStatus.active || 0;
+  const paidCount = analyticsData.loansByStatus.paid_off || 0;
+  const overdueCount = analyticsData.loansByStatus.overdue || 0;
+
+  const totalCount = activeCount + paidCount + overdueCount;
+  const overdueShare = totalCount ? (overdueCount / totalCount) * 100 : 0;
+
+  document.getElementById('health-active').textContent = activeCount;
+  document.getElementById('health-paid').textContent = paidCount;
+  document.getElementById('health-overdue').textContent = overdueCount;
+
+  const riskScore = Math.max(20, 100 - Math.round(overdueShare * 1.8));
+  const riskLabel = riskScore > 75 ? 'Low' : riskScore > 50 ? 'Moderate' : 'High';
+  const riskElem = document.getElementById('health-score');
+  riskElem.textContent = `${riskLabel} (${riskScore})`;
+  riskElem.className = `risk-rating ${riskLabel.toLowerCase()}`;
 }
 
 // Update charts
@@ -142,9 +172,20 @@ function updatePaymentChart() {
   }
 
   // Sort monthly payments by date
-  const sortedPayments = Object.entries(analyticsData.monthlyPayments)
+  let sortedPayments = Object.entries(analyticsData.monthlyPayments)
     .sort(([a], [b]) => a.localeCompare(b))
     .slice(-6); // Last 6 months
+
+  if (sortedPayments.length === 0) {
+    const defaultMonths = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const monthKey = d.toISOString().slice(0, 7);
+      defaultMonths.push([monthKey, 0]);
+    }
+    sortedPayments = defaultMonths;
+  }
 
   paymentChart = new Chart(ctx, {
     type: 'line',

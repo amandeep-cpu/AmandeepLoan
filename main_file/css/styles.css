@@ -989,6 +989,194 @@ nav a.active::after {
   animation: slideInRight 1s ease-out 0.3s both;
 }
 
+/* Dashboard-specific layout enhancements */
+.dashboard-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.72));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1.2rem 1.25rem;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.metric-value {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 0.4rem;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 0.45rem;
+}
+
+.metric-change {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.metric-change.positive { color: var(--success-color); }
+.metric-change.negative { color: var(--error-color); }
+
+.quick-actions {
+  background: rgba(9, 30, 66, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 0.9rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.chart-container {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+  box-shadow: var(--shadow-md);
+  min-height: 300px;
+  margin-bottom: 1rem;
+}
+
+.charts-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-header h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.activity-section {
+  margin-bottom: 1.3rem;
+}
+
+.activity-list, .payments-list {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.activity-item, .payment-item {
+  background: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.payment-item .payment-status.on-time { color: var(--success-color); }
+.payment-item .payment-status.due-soon { color: var(--warning-color); }
+.payment-item .payment-status.overdue { color: var(--error-color); }
+
+.portfolio-health {
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 1rem;
+  background: rgba(255,255,255,0.8);
+  box-shadow: var(--shadow-sm);
+}
+
+.portfolio-health .section-header {
+  margin-bottom: 0.8rem;
+}
+
+.health-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 0.7rem;
+}
+
+.health-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.health-card h4 {
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.health-card p {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.risk-rating {
+  color: var(--success-color);
+}
+
+.risk-rating.moderate {
+  color: var(--warning-color);
+}
+
+.risk-rating.high {
+  color: var(--error-color);
+}
+
+@media (max-width: 1100px) {
+  .dashboard-overview, .charts-section, .actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .preview-header {
   background: var(--gradient-primary);
   padding: 1rem 1.5rem;
